@@ -126,6 +126,12 @@ void iscrizioneTopic(){
   Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum)");
   client.subscribe("domenicoRossini/IoTree/temp");
   Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp)");
+  client.subscribe("domenicoRossini/IoTree/light/status");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/light/status)");
+  client.subscribe("domenicoRossini/IoTree/hum/status");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum/status)");
+  client.subscribe("domenicoRossini/IoTree/temp/status");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp/status)");
 }
 
 void reconnect() {
@@ -162,7 +168,7 @@ void loop() {
   client.loop();
   Serial.println("Ingresso in LOOP");
   //Serial.println("CIAO");
-  delay(2000);
+  delay(1000);
 }
 
 // put function definitions here:
