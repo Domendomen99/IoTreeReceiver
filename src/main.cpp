@@ -19,6 +19,7 @@ IPAddress ip_server(192,168,1,86);
 WiFiClient wifiClient;
 PubSubClient client(ip_server,1883,wifiClient);
 ///////////////////////////////////////////////////////////
+int pinLed1 = 13;
 
 void connessioneaWiFi(){
   Serial.println("Ingresso in CONNESSIONE_WIFI");
@@ -34,6 +35,9 @@ void connessioneaWiFi(){
 
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println("Ingresso in CALLBACK");
+  digitalWrite(pinLed1,HIGH);
+  delay(500);
+  digitalWrite(pinLed1,LOW);
   // handle message arrived
   Serial.print(" - Message arrived on topic : [");
   Serial.print(topic);
@@ -95,6 +99,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println();
 }
 
+void inizializzaLED(){
+  Serial.println("Ingresso in InizializzaLED");
+  pinMode(pinLed1,OUTPUT);
+  //pinMode(pinLed2,OUTPUT);
+  //digitalWrite(pinLed1,HIGH);
+  //digitalWrite(pinLed2,LOW);
+}
+
 // put function declarations here:
 //int myFunction(int, int);
 
@@ -104,6 +116,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Ingresso in SETUP");
   connessioneaWiFi();
+  inizializzaLED();
   client.setKeepAlive(30000);
   client.setCallback(callback);
 }
@@ -168,7 +181,7 @@ void loop() {
   client.loop();
   Serial.println("Ingresso in LOOP");
   //Serial.println("CIAO");
-  delay(1000);
+  delay(500);
 }
 
 // put function definitions here:
