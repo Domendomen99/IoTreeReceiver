@@ -32,6 +32,69 @@ void connessioneaWiFi(){
   Serial.println(WiFi.localIP());
 }
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.println("Ingresso in CALLBACK");
+  // handle message arrived
+  Serial.print(" - Message arrived on topic : [");
+  Serial.print(topic);
+  Serial.print("] ->  ");
+  String payloaSTR="";
+  for (int i=0;i<length;i++) {
+    Serial.print((char)payload[i]);
+    payloaSTR = payloaSTR + (char)payload[i];
+  }
+  Serial.println("");
+  String topicStr(topic);
+  String stringaTopicLight = "domenicoRossini/IoTree/light";
+  String stringaTopicHum = "domenicoRossini/IoTree/hum";
+  String stringaTopicTemp = "domenicoRossini/IoTree/temp";
+  String stringaTopicLightStatus = "domenicoRossini/IoTree/light/status";
+  String stringaTopicHumStatus = "domenicoRossini/IoTree/hum/status";
+  String stringaTopicTempStatus = "domenicoRossini/IoTree/temp/status";
+  if(topicStr==stringaTopicLight){
+    Serial.println("Ricevuto lightMSG");
+    //luminositaINT = payloaSTR.toInt();
+    /*if(luminositaINT>luminosiaLimite1){
+      digitalWrite(pinLed1,LOW);
+      digitalWrite(pinLed2,HIGH);
+    }else{
+      digitalWrite(pinLed1,HIGH);
+      digitalWrite(pinLed2,LOW);
+    }*/
+  }
+  if(topicStr==stringaTopicHum){
+    Serial.println("Ricevuto humMSG");
+  }
+  if(topicStr==stringaTopicTemp){
+    Serial.println("Ricevuto tempMSG");
+  }
+  if(topicStr==stringaTopicTempStatus){
+    Serial.println("Ricevuto tempStatMSG");
+    if(payloaSTR.equals("false")){
+      //statusTemp = false;
+    }else{
+      //statusTemp = true;
+    }
+  }
+  if(topicStr==stringaTopicHumStatus){
+    Serial.println("Ricevuto humStatMSG");
+    if(payloaSTR.equals("false")){
+      //statusHum = false;
+    }else{
+      //statusHum = true;
+    }
+  }
+  if(topicStr==stringaTopicLightStatus){
+    Serial.println("Ricevuto lightStatMSG");
+    if(payloaSTR.equals("false")){
+      //statusLight = false;
+    }else{
+      //statusLight = true;
+    }
+  }
+  Serial.println();
+}
+
 // put function declarations here:
 //int myFunction(int, int);
 
@@ -41,13 +104,65 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Ingresso in SETUP");
   connessioneaWiFi();
+  client.setKeepAlive(30000);
+  client.setCallback(callback);
+}
+
+void iscrizioneTopic(){
+  Serial.println("Ingresso in IscrizioneTOPIC");
+  /*client.subscribe("inTopic");
+  Serial.println("\n-> Iscrizione a topic (inTopic)");
+  client.subscribe("outTopic");
+  Serial.println("\n-> Iscrizione a topic (outTopic)");*/
+  //client.subscribe("domenicoRossini/IoTree/light");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/light)");
+  //client.subscribe("domenicoRossini/IoTree/temp");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp)");
+  //client.subscribe("domenicoRossini/IoTree/hum");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum)");
+  client.subscribe("domenicoRossini/IoTree/light");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/light)");
+  client.subscribe("domenicoRossini/IoTree/hum");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum)");
+  client.subscribe("domenicoRossini/IoTree/temp");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp)");
+}
+
+void reconnect() {
+  Serial.println("Ingresso in reconnect");
+  // Loop until we're reconnected
+
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+
+    // Attempt to connect
+
+    // codice per connessione con nome casuale
+    //String clientId = "ESP8266Client-";
+    //clientId += String(random(0xffff), HEX);
+    
+    if (client.connect("-> receiverIoTree <-")){
+      Serial.println("\n-> Connessione Stabilita");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 1 second");
+      delay(1000);
+    }
+  }
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  if (!client.connected()) {
+    reconnect();
+    iscrizioneTopic();
+  }
+  client.loop();
   Serial.println("Ingresso in LOOP");
-  Serial.println("CIAO");
-  delay(5000);
+  //Serial.println("CIAO");
+  delay(2000);
 }
 
 // put function definitions here:
