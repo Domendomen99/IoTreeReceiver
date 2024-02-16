@@ -114,7 +114,7 @@ void setup() {
   // put your setup code here, to run once:
   //int result = myFunction(2, 3);
   Serial.begin(9600);
-  Serial.println("Ingresso in SETUP");
+  Serial.println("Ingresso in SETUP RECEIVER");
   connessioneaWiFi();
   inizializzaLED();
   client.setKeepAlive(30000);
