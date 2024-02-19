@@ -44,10 +44,8 @@ void deepSleep(int tempo){
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
+
   Serial.println("Ingresso in CALLBACK");
-  digitalWrite(pinLed1,HIGH);
-  delay(500);
-  digitalWrite(pinLed1,LOW);
   // handle message arrived
   Serial.print(" - Message arrived on topic : [");
   Serial.print(topic);
@@ -57,17 +55,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print((char)payload[i]);
     payloaSTR = payloaSTR + (char)payload[i];
   }
-  Serial.println("");
+
   String topicStr(topic);
-  String stringaTopicLight = "domenicoRossini/IoTree/light";
-  String stringaTopicHum = "domenicoRossini/IoTree/hum";
-  String stringaTopicTemp = "domenicoRossini/IoTree/temp";
-  String stringaTopicLightStatus = "domenicoRossini/IoTree/light/status";
-  String stringaTopicHumStatus = "domenicoRossini/IoTree/hum/status";
-  String stringaTopicTempStatus = "domenicoRossini/IoTree/temp/status";
+  //String stringaTopicLight = "domenicoRossini/IoTree/light";
+  //String stringaTopicHum = "domenicoRossini/IoTree/hum";
+  //String stringaTopicTemp = "domenicoRossini/IoTree/temp";
+  //String stringaTopicLightStatus = "domenicoRossini/IoTree/light/status";
+  //String stringaTopicHumStatus = "domenicoRossini/IoTree/hum/status";
+  //String stringaTopicTempStatus = "domenicoRossini/IoTree/temp/status";
   String stringaTopicLightAttention = "domenicoRossini/IoTree/light/needAttention";
   String stringaTopicHumAttention = "domenicoRossini/IoTree/hum/needAttention";
   String stringaTopicTempAttention = "domenicoRossini/IoTree/temp/needAttention";
+  /*
   if(topicStr==stringaTopicLight){
     Serial.println("Ricevuto lightMSG");
   }
@@ -77,26 +76,39 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(topicStr==stringaTopicTemp){
     Serial.println("Ricevuto tempMSG");
   }
+  */
+
   if(topicStr==stringaTopicLightAttention){
     Serial.println("Ricevuto lightWarning");
+    digitalWrite(pinLed1,HIGH);
+    //callbackCount = 0;
+    loopCount = 0;
   }
   if(topicStr==stringaTopicHumAttention){
     Serial.println("Ricevuto humWarning");
+    digitalWrite(pinLed1,HIGH);
+    //callbackCount = 0;
+    loopCount = 0;
   }
   if(topicStr==stringaTopicTempAttention){
     Serial.println("Ricevuto tempWarning");
+    digitalWrite(pinLed1,HIGH);
+    //callbackCount = 0;
+    loopCount = 0;
   }
-  Serial.println();
 
+  /*
   callbackCount++;
-  Serial.println(callbackCount);
-  Serial.println();
+  Serial.print("Contatore CALLBACK : "); Serial.print(callbackCount);
+  Serial.println("");Serial.println("");
   if (callbackCount==3)
   {
+    digitalWrite(pinLed1,LOW);
     callbackCount = 0;
     loopCount = 0;
     deepSleep(60);
   }
+  */
 
 }
 
@@ -172,7 +184,16 @@ void riconnessioneSeNecessario(){
   }
 }
 
-
+void gestioneDeepSleep(){
+  loopCount++;
+  Serial.print("Contatore LOOP : "); Serial.print(loopCount);
+  Serial.println("");Serial.println("");
+  if (loopCount==60)
+  {
+    loopCount = 0;
+    deepSleep(60);
+  }
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -193,19 +214,11 @@ void loop() {
 
   Serial.println("Ingresso in LOOP");
 
-  delay(1000);
+  delay(1100);
 
-  Serial.println("Fine LOOP"); Serial.println("");
+  Serial.println("Fine LOOP");
 
-  loopCount++;
-  Serial.println(loopCount);
-  Serial.println();
-  if (loopCount==60)
-  {
-    loopCount = 0;
-    deepSleep(60);
-  }
-  
+  gestioneDeepSleep();
 
 }
 
