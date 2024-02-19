@@ -82,6 +82,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(topicStr==stringaTopicLightAttention){
     Serial.println("-> Ricevuto lightWarning");
     warningCount++;
+    loopCount--;
     //digitalWrite(pinLed1,HIGH);
     //callbackCount = 0;
     //loopCount = 0;
@@ -89,6 +90,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(topicStr==stringaTopicHumAttention){
     Serial.println("-> Ricevuto humWarning");
     warningCount++;
+    loopCount--;
     //digitalWrite(pinLed1,HIGH);
     //callbackCount = 0;
     //loopCount = 0;
@@ -96,6 +98,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(topicStr==stringaTopicTempAttention){
     Serial.println("-> Ricevuto tempWarning");
     warningCount++;
+    loopCount--;
     //digitalWrite(pinLed1,HIGH);
     //callbackCount = 0;
     //loopCount = 0;
