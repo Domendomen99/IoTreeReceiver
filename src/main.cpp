@@ -22,7 +22,7 @@ PubSubClient client(ip_server,1883,wifiClient);
 int pinLed1 = 13;
 ///////////////////////////////////////////////////////////
 #define MILLIS 1000000
-RTC_DATA_ATTR int callbackCount = 0;
+RTC_DATA_ATTR int warningCount = 0;
 RTC_DATA_ATTR int loopCount = 0;
 
 void connessioneaWiFi(){
@@ -55,6 +55,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print((char)payload[i]);
     payloaSTR = payloaSTR + (char)payload[i];
   }
+  Serial.println("");
 
   String topicStr(topic);
   //String stringaTopicLight = "domenicoRossini/IoTree/light";
@@ -79,21 +80,34 @@ void callback(char* topic, byte* payload, unsigned int length) {
   */
 
   if(topicStr==stringaTopicLightAttention){
-    Serial.println("Ricevuto lightWarning");
-    digitalWrite(pinLed1,HIGH);
+    Serial.println("-> Ricevuto lightWarning");
+    warningCount++;
+    //digitalWrite(pinLed1,HIGH);
     //callbackCount = 0;
-    loopCount = 0;
+    //loopCount = 0;
   }
   if(topicStr==stringaTopicHumAttention){
-    Serial.println("Ricevuto humWarning");
-    digitalWrite(pinLed1,HIGH);
+    Serial.println("-> Ricevuto humWarning");
+    warningCount++;
+    //digitalWrite(pinLed1,HIGH);
     //callbackCount = 0;
-    loopCount = 0;
+    //loopCount = 0;
   }
   if(topicStr==stringaTopicTempAttention){
-    Serial.println("Ricevuto tempWarning");
-    digitalWrite(pinLed1,HIGH);
+    Serial.println("-> Ricevuto tempWarning");
+    warningCount++;
+    //digitalWrite(pinLed1,HIGH);
     //callbackCount = 0;
+    //loopCount = 0;
+  }
+  Serial.println("");
+
+  // Accensione led solo se si ricevono 4 warning consecutivi che possono essere : 
+  // - tutte le medie sballate e una almeno che si ripete
+  // - una media sballata confermata da 4 ricezioni dei valori fuori scala
+  if(warningCount>3){
+    digitalWrite(pinLed1,HIGH);
+    warningCount = 0 ;
     loopCount = 0;
   }
 
@@ -214,7 +228,7 @@ void loop() {
 
   Serial.println("Ingresso in LOOP");
 
-  delay(1100);
+  delay(1200);
 
   Serial.println("Fine LOOP");
 
