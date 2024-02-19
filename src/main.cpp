@@ -20,6 +20,10 @@ WiFiClient wifiClient;
 PubSubClient client(ip_server,1883,wifiClient);
 ///////////////////////////////////////////////////////////
 int pinLed1 = 13;
+///////////////////////////////////////////////////////////
+#define MILLIS 1000000
+RTC_DATA_ATTR int callbackCount = 0;
+RTC_DATA_ATTR int loopCount = 0;
 
 void connessioneaWiFi(){
   Serial.println("Ingresso in CONNESSIONE_WIFI");
@@ -31,6 +35,12 @@ void connessioneaWiFi(){
   }
   Serial.println("\nConnessione Stabilita con IP : ");
   Serial.println(WiFi.localIP());
+}
+
+void deepSleep(int tempo){
+  esp_sleep_enable_timer_wakeup(tempo * MILLIS);
+  Serial.flush();
+  esp_deep_sleep_start();
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -55,16 +65,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   String stringaTopicLightStatus = "domenicoRossini/IoTree/light/status";
   String stringaTopicHumStatus = "domenicoRossini/IoTree/hum/status";
   String stringaTopicTempStatus = "domenicoRossini/IoTree/temp/status";
+  String stringaTopicLightAttention = "domenicoRossini/IoTree/light/needAttention";
+  String stringaTopicHumAttention = "domenicoRossini/IoTree/hum/needAttention";
+  String stringaTopicTempAttention = "domenicoRossini/IoTree/temp/needAttention";
   if(topicStr==stringaTopicLight){
     Serial.println("Ricevuto lightMSG");
-    //luminositaINT = payloaSTR.toInt();
-    /*if(luminositaINT>luminosiaLimite1){
-      digitalWrite(pinLed1,LOW);
-      digitalWrite(pinLed2,HIGH);
-    }else{
-      digitalWrite(pinLed1,HIGH);
-      digitalWrite(pinLed2,LOW);
-    }*/
   }
   if(topicStr==stringaTopicHum){
     Serial.println("Ricevuto humMSG");
@@ -72,31 +77,27 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(topicStr==stringaTopicTemp){
     Serial.println("Ricevuto tempMSG");
   }
-  if(topicStr==stringaTopicTempStatus){
-    Serial.println("Ricevuto tempStatMSG");
-    if(payloaSTR.equals("false")){
-      //statusTemp = false;
-    }else{
-      //statusTemp = true;
-    }
+  if(topicStr==stringaTopicLightAttention){
+    Serial.println("Ricevuto lightWarning");
   }
-  if(topicStr==stringaTopicHumStatus){
-    Serial.println("Ricevuto humStatMSG");
-    if(payloaSTR.equals("false")){
-      //statusHum = false;
-    }else{
-      //statusHum = true;
-    }
+  if(topicStr==stringaTopicHumAttention){
+    Serial.println("Ricevuto humWarning");
   }
-  if(topicStr==stringaTopicLightStatus){
-    Serial.println("Ricevuto lightStatMSG");
-    if(payloaSTR.equals("false")){
-      //statusLight = false;
-    }else{
-      //statusLight = true;
-    }
+  if(topicStr==stringaTopicTempAttention){
+    Serial.println("Ricevuto tempWarning");
   }
   Serial.println();
+
+  callbackCount++;
+  Serial.println(callbackCount);
+  Serial.println();
+  if (callbackCount==3)
+  {
+    callbackCount = 0;
+    loopCount = 0;
+    deepSleep(60);
+  }
+
 }
 
 void inizializzaLED(){
@@ -105,20 +106,6 @@ void inizializzaLED(){
   //pinMode(pinLed2,OUTPUT);
   //digitalWrite(pinLed1,HIGH);
   //digitalWrite(pinLed2,LOW);
-}
-
-// put function declarations here:
-//int myFunction(int, int);
-
-void setup() {
-  // put your setup code here, to run once:
-  //int result = myFunction(2, 3);
-  Serial.begin(9600);
-  Serial.println("Ingresso in SETUP RECEIVER");
-  connessioneaWiFi();
-  inizializzaLED();
-  client.setKeepAlive(30000);
-  client.setCallback(callback);
 }
 
 void iscrizioneTopic(){
@@ -133,18 +120,24 @@ void iscrizioneTopic(){
   //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp)");
   //client.subscribe("domenicoRossini/IoTree/hum");
   //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum)");
-  client.subscribe("domenicoRossini/IoTree/light");
-  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/light)");
-  client.subscribe("domenicoRossini/IoTree/hum");
-  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum)");
-  client.subscribe("domenicoRossini/IoTree/temp");
-  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp)");
-  client.subscribe("domenicoRossini/IoTree/light/status");
-  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/light/status)");
-  client.subscribe("domenicoRossini/IoTree/hum/status");
-  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum/status)");
-  client.subscribe("domenicoRossini/IoTree/temp/status");
-  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp/status)");
+  //client.subscribe("domenicoRossini/IoTree/light");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/light)");
+  //client.subscribe("domenicoRossini/IoTree/hum");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum)");
+  //client.subscribe("domenicoRossini/IoTree/temp");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp)");
+  //client.subscribe("domenicoRossini/IoTree/light/status");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/light/status)");
+  //client.subscribe("domenicoRossini/IoTree/hum/status");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum/status)");
+  //client.subscribe("domenicoRossini/IoTree/temp/status");
+  //Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp/status)");
+  client.subscribe("domenicoRossini/IoTree/light/needAttention");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/light/needAttention)");
+  client.subscribe("domenicoRossini/IoTree/hum/needAttention");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/hum/needAttention)");
+  client.subscribe("domenicoRossini/IoTree/temp/needAttention");
+  Serial.println("\n-> Iscrizione a topic (domenicoRossini/IoTree/temp/needAttention)");
 }
 
 void reconnect() {
@@ -172,19 +165,47 @@ void reconnect() {
   
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void riconnessioneSeNecessario(){
   if (!client.connected()) {
     reconnect();
     iscrizioneTopic();
   }
-  client.loop();
-  Serial.println("Ingresso in LOOP");
-  //Serial.println("CIAO");
-  delay(500);
 }
 
-// put function definitions here:
-//int myFunction(int x, int y) {
-//  return x + y;
-//}
+
+
+void setup() {
+  // put your setup code here, to run once:
+  //int result = myFunction(2, 3);
+  Serial.begin(9600);
+  Serial.println("Ingresso in SETUP RECEIVER");
+  connessioneaWiFi();
+  inizializzaLED();
+  client.setKeepAlive(30000);
+  client.setCallback(callback);
+}
+
+void loop() {
+
+  riconnessioneSeNecessario();
+
+  client.loop();
+
+  Serial.println("Ingresso in LOOP");
+
+  delay(1000);
+
+  Serial.println("Fine LOOP"); Serial.println("");
+
+  loopCount++;
+  Serial.println(loopCount);
+  Serial.println();
+  if (loopCount==60)
+  {
+    loopCount = 0;
+    deepSleep(60);
+  }
+  
+
+}
+
