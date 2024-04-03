@@ -79,6 +79,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   */
 
+  // se ricevo un warning il contatore dei cicli decrementa in modo da dare tempo al monitor di fare altre misurazioni
+
   if(topicStr==stringaTopicLightAttention){
     Serial.println("-> Ricevuto lightWarning");
     warningCount++;
@@ -202,6 +204,7 @@ void riconnessioneSeNecessario(){
 }
 
 void gestioneDeepSleep(){
+  // ogni 60 chiamate del metodo si dorme per 1 minuto
   loopCount++;
   Serial.print("Contatore LOOP : "); Serial.print(loopCount);
   Serial.println("");Serial.println("");
